@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doira Clicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<script>
+if (!localStorage.getItem("doira_username")) {
+    window.location.href = "login.html";
+}
+</script>
+
+<button id="chatButton" class="chat-button">💬</button>
+
+<div id="chatWindow" class="chat-window hidden">
+    <div class="chat-header">
+        <div>
+            <strong>Daniel</strong>
+            <span class="online-status">● Online</span>
+        </div>
+
+        <button id="closeChat" class="close-chat">×</button>
+    </div>
+
+    <div id="chatMessages" class="chat-messages">
+        <div class="message bot-message">
+            Hello! I'm Daniel 😊<br>
+            You can ask me anything about the Doira.
+        </div>
+    </div>
+
+    <div class="quick-questions">
+
+        <button data-question="What is Doira?">
+            🥁 What is Doira?
+        </button>
+
+        <button data-question="History of Doira">
+            📜 History
+        </button>
+
+        <button data-question="How is Doira played?">
+            🎵 Playing
+        </button>
+
+        <button data-question="Structure of Doira">
+            🔨 Structure
+        </button>
+
+        <button data-question="Importance in Uzbek culture">
+            🇺🇿 Culture
+        </button>
+
+        <button data-question="How many points do I have?">
+            ⭐ My Score
+        </button>
+
+        <button data-question="How can I unlock Golden Doira?">
+            🏆 Golden Doira
+        </button>
+
+        <button data-question="How can I unlock Ancient Doira?">
+            🥁 Ancient Doira
+        </button>
+
+        <button data-question="What achievements can I unlock?">
+            🎖 Achievements
+        </button>
+
+        <button data-question="Tell me an interesting fact about Doira">
+            💡 Fun Fact
+        </button>
+
+         <button data-question="How does the bonus work?">
+            🎁 Bonus +10
+        </button>
+
+        <button data-question="What can I do in this game?">
+            ❓ Help
+        </button>
+
+    </div>
+
+    <form id="chatForm" class="chat-input-area">
+        <input
+            id="chatInput"
+            type="text"
+            placeholder="Type your question..."
+            autocomplete="off"
+        >
+        <button type="submit">➤</button>
+    </form>
+</div>
+
+<div class="game-container">
+    <h1>Doira Clicker 🥁</h1>
+
+    <p class="score-text">Score: <span id="score">0</span></p>
+    <p class="rank-text">Rank: <span id="rank">New Learner</span></p>
+
+    <div class="doira-wrapper">
+        <img src="doira.png" id="doira" alt="Doira">
+        <span id="bonusText">+10</span>
+    </div>
+
+    <p id="factBox" class="fact-box">Unlock facts by earning more points!</p>
+
+    <button onclick="goProfile()">👤 Profile</button>
+
+    <audio id="drumSound" src="drum.mp3"></audio>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

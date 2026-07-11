@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doira Clicker Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Doira Clicker 🥁</h1>
+
+    <p>Enter your name to start:</p>
+
+    <input type="text" id="username" placeholder="Your name">
+
+    <br><br>
+
+    <button onclick="login()">Login</button>
+</div>
+
+<script>
+function login() {
+    const username = document.getElementById("username").value.trim();
+
+    if (username === "") {
+        alert("Please enter your name");
+        return;
+    }
+
+    localStorage.setItem("doira_username", username);
+
+    if (localStorage.getItem("doira_score") === null) {
+        localStorage.setItem("doira_score", "0");
+    }
+
+    window.location.href = "profile.html";
+}
+</script>
+
+</body>
+</html>
