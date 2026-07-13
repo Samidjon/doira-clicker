@@ -2,34 +2,240 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Doira Clicker</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
+
 <body>
 
-<script>
-if (!localStorage.getItem("doira_username")) {
-    window.location.href = "login.html";
-}
-</script>
+<header class="app-header">
 
-<button id="chatButton" class="chat-button">💬</button>
+    <div class="brand-section">
 
-<div id="chatWindow" class="chat-window hidden">
-    <div class="chat-header">
+        <img
+            src="daniel.png"
+            alt="Daniel"
+            class="daniel-avatar header-avatar"
+        >
+
         <div>
-            <strong>Daniel</strong>
-            <span class="online-status">● Online</span>
+            <p class="brand-label">DANIEL PRESENTS</p>
+            <h1>Doira Clicker</h1>
         </div>
 
-        <button id="closeChat" class="close-chat">×</button>
     </div>
 
-    <div id="chatMessages" class="chat-messages">
-        <div class="message bot-message">
-            Hello! I'm Daniel 😊<br>
-            You can ask me anything about the Doira.
+    <button
+        class="profile-header-button"
+        id="headerProfileButton"
+    >
+        <span>👤</span>
+        <span id="headerUsername">Player</span>
+    </button>
+
+</header>
+
+<main class="page-container game-page-container">
+
+    <section class="score-dashboard">
+
+        <article class="score-card main-score-card">
+
+            <p>Current Score</p>
+
+            <div class="score-value">
+                <span>⭐</span>
+                <strong id="score">0</strong>
+            </div>
+
+        </article>
+
+        <article class="score-card">
+
+            <p>Current Rank</p>
+            <strong id="rank">🌱 New Learner</strong>
+
+        </article>
+
+    </section>
+
+    <section class="progress-card">
+
+        <div class="progress-header">
+
+            <span id="progressRankName">
+                Progress to Beginner Performer
+            </span>
+
+            <span id="progressNumbers">
+                0 / 100
+            </span>
+
         </div>
+
+        <div class="progress-track">
+
+            <div
+                class="progress-fill"
+                id="progressFill"
+            ></div>
+
+        </div>
+
+    </section>
+
+    <section class="doira-stage">
+
+        <div class="stage-decoration decoration-one"></div>
+        <div class="stage-decoration decoration-two"></div>
+
+        <p class="stage-label">TAP THE INSTRUMENT</p>
+
+        <div class="doira-wrapper">
+
+            <div class="doira-glow"></div>
+
+            <img
+                src="doira.png"
+                id="doira"
+                alt="Doira musical instrument"
+            >
+
+            <div id="floatingPointsContainer"></div>
+
+        </div>
+
+        <h2 id="currentDoiraTitle">Classic Doira</h2>
+
+        <p>
+            Tap the Doira to earn points and hear its sound.
+        </p>
+
+    </section>
+
+    <section class="content-card fact-section">
+
+        <div class="daniel-fact-header">
+
+            <img
+                src="daniel.png"
+                alt="Daniel"
+                class="daniel-avatar fact-avatar"
+            >
+
+            <div>
+                <p class="section-label">DANIEL SAYS</p>
+                <h2>Did You Know?</h2>
+            </div>
+
+        </div>
+
+        <p id="factBox" class="fact-text">
+            Earn 50 points to unlock your first Doira fact.
+        </p>
+
+        <div class="fact-progress">
+
+            <span id="factProgressText">
+                0 facts unlocked
+            </span>
+
+        </div>
+
+    </section>
+
+    <section class="mini-features-grid">
+
+        <article
+            class="mini-feature-card"
+            id="profileFeatureCard"
+        >
+            <span>👤</span>
+            <h3>Profile</h3>
+            <p>View your score, rank, and collection.</p>
+        </article>
+
+        <article
+            class="mini-feature-card"
+            id="collectionFeatureCard"
+        >
+            <span>🥁</span>
+            <h3>Collection</h3>
+            <p>Unlock and select new Doira designs.</p>
+        </article>
+
+    </section>
+
+</main>
+
+<!-- Floating chat button -->
+
+<button
+    id="chatButton"
+    class="chat-button"
+    aria-label="Open Daniel assistant"
+>
+    <img
+        src="daniel.png"
+        alt="Daniel assistant"
+    >
+
+    <span class="chat-notification">1</span>
+</button>
+
+<!-- Chat window -->
+
+<section
+    id="chatWindow"
+    class="chat-window hidden"
+>
+
+    <header class="chat-header">
+
+        <div class="chat-agent">
+
+            <img
+                src="daniel.png"
+                alt="Daniel"
+                class="daniel-avatar chat-avatar"
+            >
+
+            <div>
+                <strong>Daniel</strong>
+                <span>● Online cultural guide</span>
+            </div>
+
+        </div>
+
+        <button
+            id="closeChat"
+            class="close-chat"
+            aria-label="Close chat"
+        >
+            ×
+        </button>
+
+    </header>
+
+    <div
+        id="chatMessages"
+        class="chat-messages"
+    >
+
+        <div class="message bot-message">
+            Hello! I am Daniel 😊 You can ask me about the Doira,
+            your score, unlocked facts, or your collection.
+        </div>
+
     </div>
 
     <div class="quick-questions">
@@ -38,7 +244,7 @@ if (!localStorage.getItem("doira_username")) {
             🥁 What is Doira?
         </button>
 
-        <button data-question="History of Doira">
+        <button data-question="Tell me about the history of Doira">
             📜 History
         </button>
 
@@ -46,11 +252,11 @@ if (!localStorage.getItem("doira_username")) {
             🎵 Playing
         </button>
 
-        <button data-question="Structure of Doira">
+        <button data-question="What is the structure of Doira?">
             🔨 Structure
         </button>
 
-        <button data-question="Importance in Uzbek culture">
+        <button data-question="Why is Doira important in Uzbek culture?">
             🇺🇿 Culture
         </button>
 
@@ -63,19 +269,15 @@ if (!localStorage.getItem("doira_username")) {
         </button>
 
         <button data-question="How can I unlock Ancient Doira?">
-            🥁 Ancient Doira
-        </button>
-
-        <button data-question="What achievements can I unlock?">
-            🎖 Achievements
+            🏺 Ancient Doira
         </button>
 
         <button data-question="Tell me an interesting fact about Doira">
             💡 Fun Fact
         </button>
 
-         <button data-question="How does the bonus work?">
-            🎁 Bonus +10
+        <button data-question="How does the bonus work?">
+            ✨ Bonus
         </button>
 
         <button data-question="What can I do in this game?">
@@ -84,35 +286,53 @@ if (!localStorage.getItem("doira_username")) {
 
     </div>
 
-    <form id="chatForm" class="chat-input-area">
+    <form
+        id="chatForm"
+        class="chat-input-area"
+    >
+
         <input
             id="chatInput"
             type="text"
-            placeholder="Type your question..."
+            placeholder="Ask Daniel..."
             autocomplete="off"
         >
-        <button type="submit">➤</button>
+
+        <button
+            type="submit"
+            aria-label="Send message"
+        >
+            ➤
+        </button>
+
     </form>
-</div>
 
-<div class="game-container">
-    <h1>Doira Clicker 🥁</h1>
+</section>
 
-    <p class="score-text">Score: <span id="score">0</span></p>
-    <p class="rank-text">Rank: <span id="rank">New Learner</span></p>
+<nav class="bottom-navigation">
 
-    <div class="doira-wrapper">
-        <img src="doira.png" id="doira" alt="Doira">
-        <span id="bonusText">+10</span>
-    </div>
+    <button class="nav-button active">
+        <span>🎮</span>
+        Game
+    </button>
 
-    <p id="factBox" class="fact-box">Unlock facts by earning more points!</p>
+    <button
+        class="nav-button"
+        data-link="profile.html"
+    >
+        <span>👤</span>
+        Profile
+    </button>
 
-    <button onclick="goProfile()">👤 Profile</button>
+</nav>
 
-    <audio id="drumSound" src="drum.mp3"></audio>
-</div>
+<audio
+    id="drumSound"
+    src="drum.mp3"
+    preload="auto"
+></audio>
 
 <script src="script.js"></script>
+
 </body>
 </html>

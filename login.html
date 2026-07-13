@@ -2,41 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Doira Clicker Login</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Daniel — Doira Adventure</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body>
 
-<div class="game-container">
-    <h1>Doira Clicker 🥁</h1>
+<body class="login-page">
 
-    <p>Enter your name to start:</p>
+<main class="login-layout">
 
-    <input type="text" id="username" placeholder="Your name">
+    <section class="login-card">
 
-    <br><br>
+        <div class="avatar-wrapper">
+            <img
+                src="daniel.png"
+                alt="Daniel chatbot avatar"
+                class="daniel-avatar large-avatar"
+            >
 
-    <button onclick="login()">Login</button>
-</div>
+            <span class="online-indicator"></span>
+        </div>
 
-<script>
-function login() {
-    const username = document.getElementById("username").value.trim();
+        <p class="small-label">YOUR CULTURAL GUIDE</p>
 
-    if (username === "") {
-        alert("Please enter your name");
-        return;
-    }
+        <h1>Welcome to Doira Adventure</h1>
 
-    localStorage.setItem("doira_username", username);
+        <p class="login-description">
+            Hello! My name is Daniel. I will guide you through the
+            history, culture, sounds, and traditions of the Uzbek Doira.
+        </p>
 
-    if (localStorage.getItem("doira_score") === null) {
-        localStorage.setItem("doira_score", "0");
-    }
+        <form id="loginForm" class="login-form">
 
-    window.location.href = "profile.html";
-}
-</script>
+            <label for="username">
+                What should I call you?
+            </label>
+
+            <input
+                type="text"
+                id="username"
+                maxlength="25"
+                placeholder="Enter your name"
+                autocomplete="name"
+                required
+            >
+
+            <button type="submit" class="primary-button full-button">
+                Start Adventure
+                <span>→</span>
+            </button>
+
+        </form>
+
+        <p class="privacy-text">
+            Your name and game progress are saved only on this device.
+        </p>
+
+    </section>
+
+</main>
+
+<script src="script.js"></script>
 
 </body>
 </html>

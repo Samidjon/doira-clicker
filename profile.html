@@ -2,101 +2,307 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Doira Profile</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Player Profile — Doira Adventure</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
+
 <body>
 
-<div class="game-container">
-    <h1>Player Profile</h1>
+<header class="app-header">
 
-    <p><strong>Name:</strong> <span id="profileName"></span></p>
-    <p><strong>Total Score:</strong> <span id="profileScore"></span></p>
-    <p><strong>Rank:</strong> <span id="profileRank"></span></p>
+    <div class="brand-section">
 
-    <h2>Doira Collection</h2>
-
-    <div class="collection">
-        <div>
-            <img src="doira.png" class="collection-img">
-            <p>Classic Doira</p>    
-            <button onclick="selectDoira('doira.png')">Select</button>
-        </div>
+        <img
+            src="daniel.png"
+            alt="Daniel"
+            class="daniel-avatar header-avatar"
+        >
 
         <div>
-            <img src="doira_gold.png" class="collection-img locked" id="goldImg">
-            <p>Golden Doira</p>
-            <button id="goldBtn" onclick="selectDoira('doira_gold.png')">Select</button>
+            <p class="brand-label">DANIEL</p>
+            <h1>Player Profile</h1>
         </div>
 
-        <div>
-            <img src="doira_ancient.png" class="collection-img locked" id="ancientImg">
-            <p>Ancient Doira</p>
-            <button id="ancientBtn" onclick="selectDoira('doira_ancient.png')">Select</button>
-        </div>
     </div>
 
-    <button onclick="playGame()">🎮 Play Game</button>
-    <button onclick="logout()">Logout</button>
-</div>
+    <button
+        class="small-icon-button"
+        id="logoutButton"
+        title="Log out"
+    >
+        ↪
+    </button>
 
-<script>
-const username = localStorage.getItem("doira_username");
-const score = Number(localStorage.getItem("doira_score")) || 0;
+</header>
 
-if (!username) {
-    window.location.href = "login.html";
-}
+<main class="page-container">
 
-document.getElementById("profileName").textContent = username;
-document.getElementById("profileScore").textContent = score;
-document.getElementById("profileRank").textContent = getRank(score);
+    <section class="profile-hero">
 
-const goldUnlocked = localStorage.getItem("doira_gold_unlocked") === "true";
-const ancientUnlocked = localStorage.getItem("doira_ancient_unlocked") === "true";
+        <div class="profile-avatar">
+            <span id="profileInitial">P</span>
+        </div>
 
-if (goldUnlocked) {
-    document.getElementById("goldImg").classList.remove("locked");
-    document.getElementById("goldBtn").disabled = false;
-} else {
-    document.getElementById("goldBtn").disabled = true;
-    document.getElementById("goldBtn").textContent = "Unlock at 100";
-}
+        <div>
+            <p class="section-label">WELCOME BACK</p>
+            <h2 id="profileName">Player</h2>
+            <p id="profileRank">🌱 New Learner</p>
+        </div>
 
-if (ancientUnlocked) {
-    document.getElementById("ancientImg").classList.remove("locked");
-    document.getElementById("ancientBtn").disabled = false;
-} else {
-    document.getElementById("ancientBtn").disabled = true;
-    document.getElementById("ancientBtn").textContent = "Unlock at 300";
-}
+    </section>
 
-function getRank(score) {
-    if (score >= 500) {
-        return "🥁 Doira Master";
-    } else if (score >= 200) {
-        return "⭐ Skilled Musician";
-    } else if (score >= 100) {
-        return "🎵 Beginner Performer";
-    } else {
-        return "🌱 New Learner";
-    }
-}
+    <section class="statistics-grid">
 
-function selectDoira(imageName) {
-    localStorage.setItem("current_doira", imageName);
-    alert("Doira selected!");
-}
+        <article class="stat-card">
+            <span class="stat-icon">⭐</span>
 
-function playGame() {
-    window.location.href = "index.html";
-}
+            <div>
+                <p>Total Score</p>
+                <strong id="profileScore">0</strong>
+            </div>
+        </article>
 
-function logout() {
-    localStorage.removeItem("doira_username");
-    window.location.href = "login.html";
-}
-</script>
+        <article class="stat-card">
+            <span class="stat-icon">🥁</span>
+
+            <div>
+                <p>Current Doira</p>
+                <strong id="selectedDoiraName">Classic</strong>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-icon">💡</span>
+
+            <div>
+                <p>Facts Unlocked</p>
+                <strong id="factsUnlocked">0 / 5</strong>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-icon">🏆</span>
+
+            <div>
+                <p>Next Goal</p>
+                <strong id="nextGoal">100 points</strong>
+            </div>
+        </article>
+
+    </section>
+
+    <section class="content-card">
+
+        <div class="section-heading">
+
+            <div>
+                <p class="section-label">YOUR COLLECTION</p>
+                <h2>Choose Your Doira</h2>
+            </div>
+
+            <span class="section-icon">🥁</span>
+
+        </div>
+
+        <div class="collection-grid">
+
+            <article
+                class="collection-card"
+                data-doira-card="doira.png"
+            >
+
+                <div class="collection-image-wrapper">
+                    <img
+                        src="doira.png"
+                        alt="Classic Doira"
+                        class="collection-image"
+                    >
+                </div>
+
+                <h3>Classic Doira</h3>
+                <p>Available from the beginning.</p>
+
+                <button
+                    class="secondary-button select-doira-button"
+                    data-image="doira.png"
+                    data-name="Classic"
+                >
+                    Select
+                </button>
+
+            </article>
+
+            <article
+                class="collection-card"
+                data-doira-card="doira_gold.png"
+            >
+
+                <div class="collection-image-wrapper">
+                    <img
+                        src="doira_gold.png"
+                        alt="Golden Doira"
+                        class="collection-image"
+                        id="goldDoiraImage"
+                    >
+
+                    <div
+                        class="lock-overlay"
+                        id="goldLock"
+                    >
+                        🔒 100
+                    </div>
+                </div>
+
+                <h3>Golden Doira</h3>
+                <p>Unlock this design at 100 points.</p>
+
+                <button
+                    class="secondary-button select-doira-button"
+                    id="goldDoiraButton"
+                    data-image="doira_gold.png"
+                    data-name="Golden"
+                >
+                    Select
+                </button>
+
+            </article>
+
+            <article
+                class="collection-card"
+                data-doira-card="doira_ancient.png"
+            >
+
+                <div class="collection-image-wrapper">
+                    <img
+                        src="doira_ancient.png"
+                        alt="Ancient Doira"
+                        class="collection-image"
+                        id="ancientDoiraImage"
+                    >
+
+                    <div
+                        class="lock-overlay"
+                        id="ancientLock"
+                    >
+                        🔒 300
+                    </div>
+                </div>
+
+                <h3>Ancient Doira</h3>
+                <p>Unlock this design at 300 points.</p>
+
+                <button
+                    class="secondary-button select-doira-button"
+                    id="ancientDoiraButton"
+                    data-image="doira_ancient.png"
+                    data-name="Ancient"
+                >
+                    Select
+                </button>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <section class="content-card">
+
+        <div class="section-heading">
+
+            <div>
+                <p class="section-label">ACHIEVEMENTS</p>
+                <h2>Your Progress</h2>
+            </div>
+
+            <span class="section-icon">🏆</span>
+
+        </div>
+
+        <div class="achievement-list">
+
+            <article
+                class="achievement-item"
+                id="achievementFirstBeat"
+            >
+                <span>🥉</span>
+
+                <div>
+                    <h3>First Beat</h3>
+                    <p>Reach 10 points.</p>
+                </div>
+
+                <strong class="achievement-status">Locked</strong>
+            </article>
+
+            <article
+                class="achievement-item"
+                id="achievementYoungMusician"
+            >
+                <span>🥈</span>
+
+                <div>
+                    <h3>Young Musician</h3>
+                    <p>Reach 100 points.</p>
+                </div>
+
+                <strong class="achievement-status">Locked</strong>
+            </article>
+
+            <article
+                class="achievement-item"
+                id="achievementDoiraMaster"
+            >
+                <span>🥇</span>
+
+                <div>
+                    <h3>Doira Master</h3>
+                    <p>Reach 500 points.</p>
+                </div>
+
+                <strong class="achievement-status">Locked</strong>
+            </article>
+
+        </div>
+
+    </section>
+
+    <button
+        class="primary-button full-button"
+        id="playFromProfile"
+    >
+        🎮 Continue Playing
+    </button>
+
+</main>
+
+<nav class="bottom-navigation">
+
+    <button
+        class="nav-button"
+        data-link="index.html"
+    >
+        <span>🎮</span>
+        Game
+    </button>
+
+    <button class="nav-button active">
+        <span>👤</span>
+        Profile
+    </button>
+
+</nav>
+
+<script src="script.js"></script>
 
 </body>
 </html>
