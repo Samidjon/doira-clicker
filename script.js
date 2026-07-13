@@ -22,6 +22,144 @@ const STORAGE_KEYS = {
 
 /* Game data */
 
+const CHAT_QUIZ_QUESTIONS = [
+    {
+        question: "What type of instrument is the Doira?",
+        options: [
+            "String instrument",
+            "Percussion instrument",
+            "Wind instrument"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which country is strongly associated with the Doira?",
+        options: [
+            "Uzbekistan",
+            "Canada",
+            "Brazil"
+        ],
+        correct: 0
+    },
+    {
+        question: "What shape is the Doira usually?",
+        options: [
+            "Square",
+            "Round",
+            "Triangle"
+        ],
+        correct: 1
+    },
+    {
+        question: "How is the Doira mainly played?",
+        options: [
+            "By blowing air",
+            "With fingers and palms",
+            "With a bow"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the frame of the Doira commonly made from?",
+        options: [
+            "Wood",
+            "Glass",
+            "Plastic only"
+        ],
+        correct: 0
+    },
+    {
+        question: "What creates the jingling sound inside the Doira?",
+        options: [
+            "Metal rings",
+            "Strings",
+            "Water"
+        ],
+        correct: 0
+    },
+    {
+        question: "Where is the Doira often performed?",
+        options: [
+            "Weddings and celebrations",
+            "Only in hospitals",
+            "Only in offices"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which parts of the hands are used to play the Doira?",
+        options: [
+            "Fingers and palms",
+            "Only elbows",
+            "Only fingernails"
+        ],
+        correct: 0
+    },
+    {
+        question: "The Doira belongs to which musical family?",
+        options: [
+            "Frame drums",
+            "Flutes",
+            "Violins"
+        ],
+        correct: 0
+    },
+    {
+        question: "What can skilled Doira players create?",
+        options: [
+            "Complex rhythms",
+            "Only one sound",
+            "No rhythm"
+        ],
+        correct: 0
+    },
+    {
+        question: "The Doira is important to which cultural heritage?",
+        options: [
+            "Uzbek cultural heritage",
+            "Only American culture",
+            "Only Australian culture"
+        ],
+        correct: 0
+    },
+    {
+        question: "Can the Doira accompany singers and dancers?",
+        options: [
+            "Yes",
+            "No",
+            "Only once a year"
+        ],
+        correct: 0
+    },
+    {
+        question: "What covers the wooden frame of a traditional Doira?",
+        options: [
+            "Skin or synthetic material",
+            "Paper only",
+            "Metal plates"
+        ],
+        correct: 0
+    },
+    {
+        question: "What kind of sounds can different playing techniques create?",
+        options: [
+            "Different tones and rhythms",
+            "Only silence",
+            "Only one identical sound"
+        ],
+        correct: 0
+    },
+    {
+        question: "Why is the Doira chatbot educational?",
+        options: [
+            "It teaches users about the instrument and Uzbek culture",
+            "It only displays advertisements",
+            "It has no learning content"
+        ],
+        correct: 0
+    }
+];
+
 const DOIRA_FACTS = [
     {
         points: 50,
@@ -682,6 +820,13 @@ const chatMessages =
     document.getElementById("chatMessages");
 const chatNotification =
     document.querySelector(".chat-notification");
+const startChatQuizButton =
+    document.getElementById("startChatQuiz");
+
+let chatQuizIndex = 0;
+let chatQuizCorrectAnswers = 0;
+let chatQuizActive = false;
+let chatQuizAnswered = false;
 
 if (chatButton && chatWindow) {
     chatButton.addEventListener("click", () => {
@@ -725,6 +870,213 @@ if (chatForm) {
         chatInput.value = "";
     });
 }
+
+if (startChatQuizButton) {
+    startChatQuizButton.addEventListener("click", () => {
+        startChatQuiz();
+    });
+}
+
+function startChatQuiz() {
+    chatQuizIndex = 0;
+    chatQuizCorrectAnswers = 0;
+    chatQuizActive = true;
+    chatQuizAnswered = false;
+
+    const alreadyCompleted =
+        localStorage.getItem("doira_chat_quiz_completed") === "true";
+
+    addChatMessage(
+        alreadyCompleted
+            ? "You have already completed this quiz. You can play again, but additional points will not be awarded."
+            : "Welcome to the Doira Quiz! There are 15 questions. You will earn 1 point for every correct answer.",
+        "bot-message"
+    );
+
+    showChatQuizQuestion();
+}
+
+
+function showChatQuizQuestion() {
+    if (!chatQuizActive || !chatMessages) {
+        return;
+    }
+
+    chatQuizAnswered = false;
+
+    const quizQuestion =
+        CHAT_QUIZ_QUESTIONS[chatQuizIndex];
+
+    const quizContainer =
+        document.createElement("div");
+
+    quizContainer.className =
+        "message bot-message quiz-message";
+
+    const questionTitle =
+        document.createElement("p");
+
+    questionTitle.className = "quiz-question-title";
+
+    questionTitle.textContent =
+        `Question ${chatQuizIndex + 1}/${CHAT_QUIZ_QUESTIONS.length}`;
+
+    const questionText =
+        document.createElement("p");
+
+    questionText.className = "quiz-question-text";
+    questionText.textContent = quizQuestion.question;
+
+    const optionsContainer =
+        document.createElement("div");
+
+    optionsContainer.className = "chat-quiz-options";
+
+    quizQuestion.options.forEach((option, optionIndex) => {
+        const optionButton =
+            document.createElement("button");
+
+        optionButton.type = "button";
+        optionButton.textContent = option;
+
+        optionButton.addEventListener("click", () => {
+            processChatQuizAnswer(
+                optionIndex,
+                quizContainer
+            );
+        });
+
+        optionsContainer.appendChild(optionButton);
+    });
+
+    quizContainer.appendChild(questionTitle);
+    quizContainer.appendChild(questionText);
+    quizContainer.appendChild(optionsContainer);
+
+    chatMessages.appendChild(quizContainer);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
+function processChatQuizAnswer(
+    selectedAnswer,
+    quizContainer
+) {
+    if (chatQuizAnswered || !chatQuizActive) {
+        return;
+    }
+
+    chatQuizAnswered = true;
+
+    const quizQuestion =
+        CHAT_QUIZ_QUESTIONS[chatQuizIndex];
+
+    const optionButtons =
+        quizContainer.querySelectorAll(
+            ".chat-quiz-options button"
+        );
+
+    optionButtons.forEach((button) => {
+        button.disabled = true;
+    });
+
+    const isCorrect =
+        selectedAnswer === quizQuestion.correct;
+
+    const alreadyCompleted =
+        localStorage.getItem(
+            "doira_chat_quiz_completed"
+        ) === "true";
+
+    if (isCorrect) {
+        chatQuizCorrectAnswers++;
+
+        optionButtons[selectedAnswer].classList.add(
+            "correct-answer"
+        );
+
+        if (!alreadyCompleted) {
+            const newScore = getStoredScore() + 1;
+
+            saveScore(newScore);
+            score = newScore;
+
+            updateGameInterface();
+
+            addChatMessage(
+                "✅ Correct! You earned +1 point.",
+                "bot-message"
+            );
+        } else {
+            addChatMessage(
+                "✅ Correct! No additional point was awarded because you have already completed the quiz.",
+                "bot-message"
+            );
+        }
+    } else {
+        optionButtons[selectedAnswer].classList.add(
+            "wrong-answer"
+        );
+
+        optionButtons[
+            quizQuestion.correct
+        ].classList.add("correct-answer");
+
+        addChatMessage(
+            `❌ Wrong. The correct answer is: ${quizQuestion.options[quizQuestion.correct]}`,
+            "bot-message"
+        );
+    }
+
+    chatQuizIndex++;
+
+    if (
+        chatQuizIndex <
+        CHAT_QUIZ_QUESTIONS.length
+    ) {
+        window.setTimeout(() => {
+            showChatQuizQuestion();
+        }, 700);
+    } else {
+        window.setTimeout(() => {
+            finishChatQuiz(alreadyCompleted);
+        }, 700);
+    }
+}
+
+
+function finishChatQuiz(alreadyCompleted) {
+    chatQuizActive = false;
+
+    if (!alreadyCompleted) {
+        localStorage.setItem(
+            "doira_chat_quiz_completed",
+            "true"
+        );
+    }
+
+    let finalMessage;
+
+    if (chatQuizCorrectAnswers === 15) {
+        finalMessage =
+            "🏆 Perfect! You are a true Doira Master!";
+    } else if (chatQuizCorrectAnswers >= 11) {
+        finalMessage =
+            "⭐ Excellent result! You know a lot about the Doira.";
+    } else if (chatQuizCorrectAnswers >= 7) {
+        finalMessage =
+            "😊 Good job! Keep learning about the Doira.";
+    } else {
+        finalMessage =
+            "📚 Keep learning and try the quiz again.";
+    }
+
+    addChatMessage(
+        `🎉 Quiz completed!\nYour result: ${chatQuizCorrectAnswers}/${CHAT_QUIZ_QUESTIONS.length}\n${finalMessage}`,
+        "bot-message"
+    );
+}
+
 
 function sendQuestion(question) {
     addChatMessage(question, "user-message");
