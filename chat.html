@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Daniel Assistant — Doira Adventure</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body class="assistant-page">
+
+<header class="app-header">
+
+    <div class="brand-section">
+        <img
+            src="daniel.png"
+            alt="Daniel"
+            class="daniel-avatar header-avatar"
+        >
+
+        <div>
+            <p class="brand-label">DOIRA CULTURAL GUIDE</p>
+            <h1>Daniel Assistant</h1>
+        </div>
+    </div>
+
+    <button
+        class="profile-header-button"
+        data-link="profile.html"
+    >
+        <span>👤</span>
+        <span id="chatHeaderUsername">Player</span>
+    </button>
+
+</header>
+
+<main class="assistant-layout">
+
+    <aside class="assistant-sidebar">
+
+        <section class="assistant-profile-card">
+
+            <div class="avatar-wrapper">
+                <img
+                    src="daniel.png"
+                    alt="Daniel chatbot"
+                    class="daniel-avatar assistant-large-avatar"
+                >
+
+                <span class="online-indicator"></span>
+            </div>
+
+            <h2>Daniel</h2>
+
+            <p class="assistant-status">
+                ● Online cultural guide
+            </p>
+
+            <p>
+                I can teach you about the Doira, explain game features,
+                show your progress, and start an educational quiz.
+            </p>
+
+        </section>
+
+        <section class="assistant-player-stats">
+
+            <article>
+                <span>⭐</span>
+
+                <div>
+                    <small>Your score</small>
+                    <strong id="chatPageScore">0</strong>
+                </div>
+            </article>
+
+            <article>
+                <span>🏆</span>
+
+                <div>
+                    <small>Your rank</small>
+                    <strong id="chatPageRank">New Learner</strong>
+                </div>
+            </article>
+
+            <article>
+                <span>🥁</span>
+
+                <div>
+                    <small>Selected Doira</small>
+                    <strong id="chatPageDoira">Classic</strong>
+                </div>
+            </article>
+
+        </section>
+
+        <section class="assistant-topic-list">
+
+            <p class="section-label">POPULAR TOPICS</p>
+
+            <button data-question="What is Doira?">
+                🥁 What is Doira?
+            </button>
+
+            <button data-question="Tell me about the history of Doira">
+                📜 History of Doira
+            </button>
+
+            <button data-question="How is Doira played?">
+                🎵 Playing techniques
+            </button>
+
+            <button data-question="What is the structure of Doira?">
+                🔨 Structure and materials
+            </button>
+
+            <button data-question="Why is Doira important in Uzbek culture?">
+                🇺🇿 Uzbek culture
+            </button>
+
+            <button data-question="/quiz">
+                📝 Start the quiz
+            </button>
+
+        </section>
+
+    </aside>
+
+    <section class="assistant-chat-panel">
+
+        <header class="assistant-chat-header">
+
+            <div class="chat-agent">
+
+                <img
+                    src="daniel.png"
+                    alt="Daniel"
+                    class="daniel-avatar chat-page-avatar"
+                >
+
+                <div>
+                    <strong>Chat with Daniel</strong>
+                    <span>Ask about Doira or your game progress</span>
+                </div>
+
+            </div>
+
+            <button
+                id="clearChatHistory"
+                class="clear-chat-button"
+                type="button"
+                title="Clear conversation"
+            >
+                🗑 Clear
+            </button>
+
+        </header>
+
+        <div
+            id="chatMessages"
+            class="assistant-page-messages"
+        >
+
+            <div class="message bot-message">
+                Hello! I am Daniel 😊
+
+                You can ask me about the Doira, Uzbek culture, your score,
+                collection, achievements, game progress, or start a quiz.
+            </div>
+
+        </div>
+
+        <section class="assistant-suggestions">
+
+            <p>Suggested questions</p>
+
+            <div class="assistant-suggestion-grid">
+
+                <button data-question="What can you do?">
+                    ❓ Your functions
+                </button>
+
+                <button data-question="How many points do I have?">
+                    ⭐ My score
+                </button>
+
+                <button data-question="What is my current rank?">
+                    🏆 My rank
+                </button>
+
+                <button data-question="What is my next goal?">
+                    📈 Next goal
+                </button>
+
+                <button data-question="Which Doira am I using?">
+                    🥁 Current Doira
+                </button>
+
+                <button data-question="What achievements can I unlock?">
+                    🏅 Achievements
+                </button>
+
+                <button data-question="How can I unlock Golden Doira?">
+                    ✨ Golden Doira
+                </button>
+
+                <button data-question="How can I unlock Ancient Doira?">
+                    🏺 Ancient Doira
+                </button>
+
+                <button data-question="Tell me an interesting fact about Doira">
+                    💡 Random fact
+                </button>
+
+                <button data-question="What creates the jingling sound?">
+                    🔔 Doira sound
+                </button>
+
+                <button data-question="Where is Doira usually played?">
+                    🎉 Performances
+                </button>
+
+                <button data-question="How is my progress saved?">
+                    💾 Saving progress
+                </button>
+
+                <button data-question="How does the bonus work?">
+                    🎁 Bonus points
+                </button>
+
+                <button data-question="/quiz">
+                    📝 Start quiz
+                </button>
+
+            </div>
+
+        </section>
+
+        <form
+            id="chatForm"
+            class="assistant-page-input"
+        >
+
+            <input
+                id="chatInput"
+                type="text"
+                placeholder="Ask Daniel a question..."
+                maxlength="300"
+                autocomplete="off"
+            >
+
+            <button type="submit">
+                <span>Send</span>
+                <span>➤</span>
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+<nav class="bottom-navigation">
+
+    <button
+        class="nav-button"
+        data-link="index.html"
+    >
+        <span>🎮</span>
+        Game
+    </button>
+
+    <button class="nav-button active">
+        <span>💬</span>
+        Assistant
+    </button>
+
+    <button
+        class="nav-button"
+        data-link="profile.html"
+    >
+        <span>👤</span>
+        Profile
+    </button>
+
+</nav>
+
+<script src="script.js"></script>
+
+</body>
+</html>

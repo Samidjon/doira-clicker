@@ -806,27 +806,79 @@ if (logoutButton) {
 
 /* Daniel chat assistant */
 
+/* Daniel chat assistant */
+
+const CHAT_HISTORY_KEY = "doira_chat_history";
+
 const chatButton =
     document.getElementById("chatButton");
+
 const chatWindow =
     document.getElementById("chatWindow");
+
 const closeChat =
     document.getElementById("closeChat");
+
 const chatForm =
     document.getElementById("chatForm");
+
 const chatInput =
     document.getElementById("chatInput");
+
 const chatMessages =
     document.getElementById("chatMessages");
+
 const chatNotification =
     document.querySelector(".chat-notification");
-const startChatQuizButton =
-    document.getElementById("startChatQuiz");
 
-let chatQuizIndex = 0;
-let chatQuizCorrectAnswers = 0;
-let chatQuizActive = false;
-let chatQuizAnswered = false;
+const clearChatHistoryButton =
+    document.getElementById("clearChatHistory");
+
+const isFullChatPage =
+    document.body.classList.contains("assistant-page");
+
+
+function initialiseChatPage() {
+    const username = getStoredUsername() || "Player";
+    const currentScore = getStoredScore();
+
+    const headerUsername =
+        document.getElementById("chatHeaderUsername");
+
+    const chatPageScore =
+        document.getElementById("chatPageScore");
+
+    const chatPageRank =
+        document.getElementById("chatPageRank");
+
+    const chatPageDoira =
+        document.getElementById("chatPageDoira");
+
+    if (headerUsername) {
+        headerUsername.textContent = username;
+    }
+
+    if (chatPageScore) {
+        chatPageScore.textContent = String(currentScore);
+    }
+
+    if (chatPageRank) {
+        chatPageRank.textContent = getRank(currentScore);
+    }
+
+    if (chatPageDoira) {
+        chatPageDoira.textContent =
+            getCurrentDoiraName();
+    }
+
+    loadChatHistory();
+}
+
+
+if (isFullChatPage) {
+    initialiseChatPage();
+}
+
 
 if (chatButton && chatWindow) {
     chatButton.addEventListener("click", () => {
@@ -842,19 +894,30 @@ if (chatButton && chatWindow) {
     });
 }
 
+
 if (closeChat && chatWindow) {
     closeChat.addEventListener("click", () => {
         chatWindow.classList.add("hidden");
     });
 }
 
+
 document
-    .querySelectorAll(".quick-questions button")
+    .querySelectorAll(
+        ".quick-questions button, " +
+        ".assistant-topic-list button, " +
+        ".assistant-suggestion-grid button"
+    )
     .forEach((button) => {
         button.addEventListener("click", () => {
-            sendQuestion(button.dataset.question);
+            const question = button.dataset.question;
+
+            if (question) {
+                sendQuestion(question);
+            }
         });
     });
+
 
 if (chatForm) {
     chatForm.addEventListener("submit", (event) => {
@@ -871,229 +934,111 @@ if (chatForm) {
     });
 }
 
-if (startChatQuizButton) {
-    startChatQuizButton.addEventListener("click", () => {
-        startChatQuiz();
-    });
-}
 
-function startChatQuiz() {
-    chatQuizIndex = 0;
-    chatQuizCorrectAnswers = 0;
-    chatQuizActive = true;
-    chatQuizAnswered = false;
-
-    const alreadyCompleted =
-        localStorage.getItem("doira_chat_quiz_completed") === "true";
-
-    addChatMessage(
-        alreadyCompleted
-            ? "You have already completed this quiz. You can play again, but additional points will not be awarded."
-            : "Welcome to the Doira Quiz! There are 15 questions. You will earn 1 point for every correct answer.",
-        "bot-message"
-    );
-
-    showChatQuizQuestion();
-}
-
-
-function showChatQuizQuestion() {
-    if (!chatQuizActive || !chatMessages) {
-        return;
-    }
-
-    chatQuizAnswered = false;
-
-    const quizQuestion =
-        CHAT_QUIZ_QUESTIONS[chatQuizIndex];
-
-    const quizContainer =
-        document.createElement("div");
-
-    quizContainer.className =
-        "message bot-message quiz-message";
-
-    const questionTitle =
-        document.createElement("p");
-
-    questionTitle.className = "quiz-question-title";
-
-    questionTitle.textContent =
-        `Question ${chatQuizIndex + 1}/${CHAT_QUIZ_QUESTIONS.length}`;
-
-    const questionText =
-        document.createElement("p");
-
-    questionText.className = "quiz-question-text";
-    questionText.textContent = quizQuestion.question;
-
-    const optionsContainer =
-        document.createElement("div");
-
-    optionsContainer.className = "chat-quiz-options";
-
-    quizQuestion.options.forEach((option, optionIndex) => {
-        const optionButton =
-            document.createElement("button");
-
-        optionButton.type = "button";
-        optionButton.textContent = option;
-
-        optionButton.addEventListener("click", () => {
-            processChatQuizAnswer(
-                optionIndex,
-                quizContainer
+if (clearChatHistoryButton) {
+    clearChatHistoryButton.addEventListener(
+        "click",
+        () => {
+            const confirmed = window.confirm(
+                "Do you want to clear the conversation?"
             );
-        });
 
-        optionsContainer.appendChild(optionButton);
-    });
+            if (!confirmed) {
+                return;
+            }
 
-    quizContainer.appendChild(questionTitle);
-    quizContainer.appendChild(questionText);
-    quizContainer.appendChild(optionsContainer);
+            localStorage.removeItem(CHAT_HISTORY_KEY);
 
-    chatMessages.appendChild(quizContainer);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-
-function processChatQuizAnswer(
-    selectedAnswer,
-    quizContainer
-) {
-    if (chatQuizAnswered || !chatQuizActive) {
-        return;
-    }
-
-    chatQuizAnswered = true;
-
-    const quizQuestion =
-        CHAT_QUIZ_QUESTIONS[chatQuizIndex];
-
-    const optionButtons =
-        quizContainer.querySelectorAll(
-            ".chat-quiz-options button"
-        );
-
-    optionButtons.forEach((button) => {
-        button.disabled = true;
-    });
-
-    const isCorrect =
-        selectedAnswer === quizQuestion.correct;
-
-    const alreadyCompleted =
-        localStorage.getItem(
-            "doira_chat_quiz_completed"
-        ) === "true";
-
-    if (isCorrect) {
-        chatQuizCorrectAnswers++;
-
-        optionButtons[selectedAnswer].classList.add(
-            "correct-answer"
-        );
-
-        if (!alreadyCompleted) {
-            const newScore = getStoredScore() + 1;
-
-            saveScore(newScore);
-            score = newScore;
-
-            updateGameInterface();
+            chatMessages.innerHTML = "";
 
             addChatMessage(
-                "✅ Correct! You earned +1 point.",
-                "bot-message"
-            );
-        } else {
-            addChatMessage(
-                "✅ Correct! No additional point was awarded because you have already completed the quiz.",
+                "Conversation cleared. How can I help you?",
                 "bot-message"
             );
         }
-    } else {
-        optionButtons[selectedAnswer].classList.add(
-            "wrong-answer"
-        );
-
-        optionButtons[
-            quizQuestion.correct
-        ].classList.add("correct-answer");
-
-        addChatMessage(
-            `❌ Wrong. The correct answer is: ${quizQuestion.options[quizQuestion.correct]}`,
-            "bot-message"
-        );
-    }
-
-    chatQuizIndex++;
-
-    if (
-        chatQuizIndex <
-        CHAT_QUIZ_QUESTIONS.length
-    ) {
-        window.setTimeout(() => {
-            showChatQuizQuestion();
-        }, 700);
-    } else {
-        window.setTimeout(() => {
-            finishChatQuiz(alreadyCompleted);
-        }, 700);
-    }
-}
-
-
-function finishChatQuiz(alreadyCompleted) {
-    chatQuizActive = false;
-
-    if (!alreadyCompleted) {
-        localStorage.setItem(
-            "doira_chat_quiz_completed",
-            "true"
-        );
-    }
-
-    let finalMessage;
-
-    if (chatQuizCorrectAnswers === 15) {
-        finalMessage =
-            "🏆 Perfect! You are a true Doira Master!";
-    } else if (chatQuizCorrectAnswers >= 11) {
-        finalMessage =
-            "⭐ Excellent result! You know a lot about the Doira.";
-    } else if (chatQuizCorrectAnswers >= 7) {
-        finalMessage =
-            "😊 Good job! Keep learning about the Doira.";
-    } else {
-        finalMessage =
-            "📚 Keep learning and try the quiz again.";
-    }
-
-    addChatMessage(
-        `🎉 Quiz completed!\nYour result: ${chatQuizCorrectAnswers}/${CHAT_QUIZ_QUESTIONS.length}\n${finalMessage}`,
-        "bot-message"
     );
 }
 
 
 function sendQuestion(question) {
-    addChatMessage(question, "user-message");
+    const normalizedQuestion =
+        question.toLowerCase().trim();
+
+    if (
+        normalizedQuestion === "/clear" ||
+        normalizedQuestion === "clear chat"
+    ) {
+        localStorage.removeItem(CHAT_HISTORY_KEY);
+
+        if (chatMessages) {
+            chatMessages.innerHTML = "";
+        }
+
+        addChatMessage(
+            "Conversation cleared. How can I help you?",
+            "bot-message"
+        );
+
+        return;
+    }
+
+    if (
+        normalizedQuestion === "/quiz" ||
+        normalizedQuestion === "start quiz"
+    ) {
+        addChatMessage(
+            "Start the 15-question Doira quiz.",
+            "user-message"
+        );
+
+        if (typeof startChatQuiz === "function") {
+            showTypingIndicator();
+
+            window.setTimeout(() => {
+                removeTypingIndicator();
+                startChatQuiz();
+            }, 450);
+        } else {
+            addChatMessage(
+                "The quiz module is not connected to this page yet.",
+                "bot-message"
+            );
+        }
+
+        return;
+    }
+
+    addChatMessage(
+        question,
+        "user-message"
+    );
+
+    showTypingIndicator();
 
     window.setTimeout(() => {
+        removeTypingIndicator();
+
         const answer = getBotAnswer(question);
 
-        addChatMessage(answer, "bot-message");
-    }, 350);
+        addChatMessage(
+            answer,
+            "bot-message"
+        );
+    }, 500);
 }
 
-function addChatMessage(text, messageClass) {
+
+function addChatMessage(
+    text,
+    messageClass,
+    saveToHistory = true
+) {
     if (!chatMessages) {
         return;
     }
 
-    const message = document.createElement("div");
+    const message =
+        document.createElement("div");
 
     message.classList.add(
         "message",
@@ -1106,23 +1051,262 @@ function addChatMessage(text, messageClass) {
 
     chatMessages.scrollTop =
         chatMessages.scrollHeight;
+
+    if (saveToHistory) {
+        saveChatMessage(text, messageClass);
+    }
+
+    if (isFullChatPage) {
+        updateAssistantPageStats();
+    }
 }
 
-function getBotAnswer(question) {
-    const text = question.toLowerCase().trim();
-    const username = getStoredUsername() || "player";
+
+function showTypingIndicator() {
+    if (
+        !chatMessages ||
+        document.getElementById("chatTypingIndicator")
+    ) {
+        return;
+    }
+
+    const indicator =
+        document.createElement("div");
+
+    indicator.id = "chatTypingIndicator";
+    indicator.className = "chat-typing-indicator";
+
+    indicator.innerHTML = `
+        <span></span>
+        <span></span>
+        <span></span>
+    `;
+
+    chatMessages.appendChild(indicator);
+
+    chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+}
+
+
+function removeTypingIndicator() {
+    document
+        .getElementById("chatTypingIndicator")
+        ?.remove();
+}
+
+
+function saveChatMessage(text, messageClass) {
+    const history = getChatHistory();
+
+    history.push({
+        text: text,
+        messageClass: messageClass
+    });
+
+    const limitedHistory =
+        history.slice(-60);
+
+    localStorage.setItem(
+        CHAT_HISTORY_KEY,
+        JSON.stringify(limitedHistory)
+    );
+}
+
+
+function getChatHistory() {
+    try {
+        const saved =
+            localStorage.getItem(CHAT_HISTORY_KEY);
+
+        if (!saved) {
+            return [];
+        }
+
+        const parsed = JSON.parse(saved);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : [];
+    } catch (error) {
+        console.error(
+            "Unable to read chat history:",
+            error
+        );
+
+        return [];
+    }
+}
+
+
+function loadChatHistory() {
+    if (!chatMessages) {
+        return;
+    }
+
+    const history = getChatHistory();
+
+    if (history.length === 0) {
+        return;
+    }
+
+    chatMessages.innerHTML = "";
+
+    history.forEach((item) => {
+        addChatMessage(
+            item.text,
+            item.messageClass,
+            false
+        );
+    });
+}
+
+
+function updateAssistantPageStats() {
+    if (!isFullChatPage) {
+        return;
+    }
+
     const currentScore = getStoredScore();
+
+    const chatPageScore =
+        document.getElementById("chatPageScore");
+
+    const chatPageRank =
+        document.getElementById("chatPageRank");
+
+    const chatPageDoira =
+        document.getElementById("chatPageDoira");
+
+    if (chatPageScore) {
+        chatPageScore.textContent =
+            String(currentScore);
+    }
+
+    if (chatPageRank) {
+        chatPageRank.textContent =
+            getRank(currentScore);
+    }
+
+    if (chatPageDoira) {
+        chatPageDoira.textContent =
+            getCurrentDoiraName();
+    }
+}
+
+
+function getNextRankInformation(currentScore) {
+    if (currentScore < 100) {
+        return (
+            `${100 - currentScore} more points are required ` +
+            "to become a Beginner Performer."
+        );
+    }
+
+    if (currentScore < 200) {
+        return (
+            `${200 - currentScore} more points are required ` +
+            "to become a Skilled Musician."
+        );
+    }
+
+    if (currentScore < 500) {
+        return (
+            `${500 - currentScore} more points are required ` +
+            "to become a Doira Master."
+        );
+    }
+
+    return "You have already reached the highest rank!";
+}
+
+
+function getUnlockedAchievementText(currentScore) {
+    const unlocked = [];
+
+    if (currentScore >= 10) {
+        unlocked.push("First Beat");
+    }
+
+    if (currentScore >= 100) {
+        unlocked.push("Young Musician");
+    }
+
+    if (currentScore >= 500) {
+        unlocked.push("Doira Master");
+    }
+
+    if (unlocked.length === 0) {
+        return (
+            "You have not unlocked an achievement yet. " +
+            "Reach 10 points to unlock First Beat."
+        );
+    }
+
+    return (
+        `Your unlocked achievements are: ${unlocked.join(", ")}.`
+    );
+}
+
+
+function getBotAnswer(question) {
+    const text =
+        question.toLowerCase().trim();
+
+    const username =
+        getStoredUsername() || "player";
+
+    const currentScore =
+        getStoredScore();
+
+    const currentRank =
+        getRank(currentScore);
+
+    /*
+     * Greeting and assistant information
+     */
 
     if (
         text.includes("hello") ||
-        text.includes("hi") ||
-        text.includes("hey")
+        text === "hi" ||
+        text.includes("hey") ||
+        text.includes("привет")
     ) {
         return (
-            `Hello, ${username}! ` +
-            "How can I help you learn about the Doira?"
+            `Hello, ${username}! I am Daniel, your Doira ` +
+            "cultural guide. What would you like to learn today?"
         );
     }
+
+    if (
+        text.includes("who are you") ||
+        text.includes("your name") ||
+        text.includes("кто ты")
+    ) {
+        return (
+            "My name is Daniel. I am an educational assistant " +
+            "created to teach users about the Uzbek Doira and " +
+            "support them while playing Doira Adventure."
+        );
+    }
+
+    if (
+        text.includes("what can you do") ||
+        text.includes("your functions") ||
+        text === "help" ||
+        text === "/help"
+    ) {
+        return (
+            "I can explain the Doira's history, structure, sounds, " +
+            "playing techniques, and cultural importance. I can also " +
+            "show your score, rank, achievements, collection, next goal, " +
+            "explain game mechanics, and start the 15-question quiz."
+        );
+    }
+
+    /*
+     * Doira knowledge
+     */
 
     if (
         text.includes("what is doira") ||
@@ -1131,144 +1315,326 @@ function getBotAnswer(question) {
         text.includes("что такое доира")
     ) {
         return (
-            "The Doira is a traditional Central Asian frame drum. " +
-            "It is especially important in Uzbek music and culture."
+            "The Doira is a traditional Central Asian percussion " +
+            "instrument. It is a round frame drum that is especially " +
+            "important in Uzbek music, dance, celebrations, and culture."
         );
     }
 
     if (
         text.includes("history") ||
+        text.includes("origin") ||
         text.includes("история")
     ) {
         return (
             "The Doira has been used in Central Asia for centuries. " +
-            "It is traditionally played at weddings, festivals, dances, " +
-            "and cultural performances."
+            "It became an important part of Uzbek folk music and has " +
+            "traditionally accompanied celebrations, singers, dancers, " +
+            "weddings, and public cultural performances."
         );
     }
 
     if (
         text.includes("structure") ||
         text.includes("made of") ||
+        text.includes("material") ||
         text.includes("строение") ||
         text.includes("сделана")
     ) {
         return (
-            "The Doira has a round wooden frame covered with skin or " +
-            "synthetic material. Metal rings inside the frame create " +
-            "its jingling sound."
+            "A Doira normally consists of a circular wooden frame " +
+            "covered with skin or a synthetic membrane. Small metal " +
+            "rings are attached inside the frame and create an " +
+            "additional jingling sound."
         );
     }
 
     if (
-        text.includes("played") ||
+        text.includes("metal ring") ||
+        text.includes("jingling") ||
+        text.includes("jingle") ||
+        text.includes("звен")
+    ) {
+        return (
+            "The jingling sound comes from small metal rings attached " +
+            "inside the wooden frame. They move when the musician strikes " +
+            "or shakes the instrument."
+        );
+    }
+
+    if (
+        text.includes("sound") ||
+        text.includes("tone") ||
+        text.includes("звук")
+    ) {
+        return (
+            "The Doira can produce deep palm sounds, sharp finger taps, " +
+            "light rhythmic tones, and metallic jingling sounds. Different " +
+            "areas of the membrane create different tones."
+        );
+    }
+
+    if (
+        text.includes("how is doira played") ||
         text.includes("how to play") ||
-        text.includes("playing") ||
+        text.includes("playing technique") ||
         text.includes("играют")
     ) {
         return (
             "The Doira is played with the fingers, palms, and wrists. " +
-            "Musicians strike different parts of the surface to create " +
-            "high, low, soft, and powerful sounds."
+            "Players strike different parts of the surface and combine " +
+            "soft taps, strong palm hits, finger rolls, and controlled " +
+            "movements to create rhythms."
+        );
+    }
+
+    if (
+        text.includes("where") &&
+        (
+            text.includes("played") ||
+            text.includes("used")
+        )
+    ) {
+        return (
+            "The Doira is commonly played at Uzbek weddings, festivals, " +
+            "national celebrations, concerts, traditional dances, and " +
+            "folk music performances."
         );
     }
 
     if (
         text.includes("culture") ||
         text.includes("important") ||
-        text.includes("культура") ||
-        text.includes("важна")
+        text.includes("heritage") ||
+        text.includes("культура")
     ) {
         return (
             "The Doira is an important part of Uzbek cultural heritage. " +
-            "It accompanies traditional music, dance, weddings, and " +
-            "national celebrations."
+            "It connects music, dance, community celebrations, and national " +
+            "traditions, helping preserve cultural identity for future generations."
         );
     }
 
     if (
-        text.includes("score") ||
-        text.includes("points") ||
-        text.includes("балл") ||
-        text.includes("очки")
+        text.includes("uzbekistan") ||
+        text.includes("uzbek")
     ) {
         return (
-            `You currently have ${currentScore} points and your rank is ` +
-            `${getRank(currentScore)}.`
+            "In Uzbekistan, the Doira is one of the best-known traditional " +
+            "percussion instruments. It is widely associated with national " +
+            "music, celebrations, dance, and cultural performances."
+        );
+    }
+
+    if (
+        text.includes("interesting fact") ||
+        text.includes("random fact") ||
+        text.includes("fun fact") ||
+        text === "fact"
+    ) {
+        const randomIndex =
+            Math.floor(
+                Math.random() * RANDOM_FACTS.length
+            );
+
+        return RANDOM_FACTS[randomIndex];
+    }
+
+    /*
+     * Game score and progress
+     */
+
+    if (
+        text.includes("score") ||
+        text.includes("how many points") ||
+        text.includes("my points") ||
+        text.includes("очки") ||
+        text.includes("балл")
+    ) {
+        return (
+            `You currently have ${currentScore} points. ` +
+            `Your current rank is ${currentRank}.`
+        );
+    }
+
+    if (
+        text.includes("my rank") ||
+        text.includes("current rank") ||
+        text === "rank"
+    ) {
+        return (
+            `Your current rank is ${currentRank}. ` +
+            getNextRankInformation(currentScore)
+        );
+    }
+
+    if (
+        text.includes("next goal") ||
+        text.includes("next rank") ||
+        text.includes("progress")
+    ) {
+        return getNextRankInformation(currentScore);
+    }
+
+    if (
+        text.includes("achievement")
+    ) {
+        return getUnlockedAchievementText(currentScore);
+    }
+
+    /*
+     * Doira collection
+     */
+
+    if (
+        text.includes("which doira") ||
+        text.includes("current doira") ||
+        text.includes("selected doira")
+    ) {
+        return (
+            `You are currently using the ` +
+            `${getCurrentDoiraName()} Doira.`
+        );
+    }
+
+    if (
+        text.includes("collection") ||
+        text.includes("available doira")
+    ) {
+        return (
+            "The collection contains the Classic Doira, Golden Doira, " +
+            "and Ancient Doira. The Classic Doira is available immediately, " +
+            "Golden unlocks at 100 points, and Ancient unlocks at 300 points."
         );
     }
 
     if (
         text.includes("golden")
     ) {
+        if (currentScore >= 100) {
+            return (
+                "You have unlocked the Golden Doira! Open your profile " +
+                "and select it from the collection."
+            );
+        }
+
         return (
-            "The Golden Doira is unlocked when you reach 100 points."
+            `The Golden Doira unlocks at 100 points. ` +
+            `You need ${100 - currentScore} more points.`
         );
     }
 
     if (
         text.includes("ancient")
     ) {
+        if (currentScore >= 300) {
+            return (
+                "You have unlocked the Ancient Doira! Open your profile " +
+                "and select it from the collection."
+            );
+        }
+
         return (
-            "The Ancient Doira is unlocked when you reach 300 points."
+            `The Ancient Doira unlocks at 300 points. ` +
+            `You need ${300 - currentScore} more points.`
         );
     }
+
+    if (
+        text.includes("classic doira")
+    ) {
+        return (
+            "The Classic Doira is the first instrument in your collection. " +
+            "It is available to every player from the beginning."
+        );
+    }
+
+    /*
+     * Game mechanics
+     */
 
     if (
         text.includes("bonus") ||
-        text.includes("+10")
+        text.includes("+10") ||
+        text.includes("special click")
     ) {
         return (
-            "Every click normally gives you 1 point. There is a 10% " +
-            "chance to receive a special +10 bonus with a golden animation."
+            "A normal click gives 1 point. Each click also has a 10% chance " +
+            "of giving a special +10 bonus with a golden floating animation."
         );
     }
 
     if (
-        text.includes("interesting fact") ||
-        text.includes("fun fact") ||
-        text.includes("fact")
-    ) {
-        const randomIndex = Math.floor(
-            Math.random() * RANDOM_FACTS.length
-        );
-
-        return RANDOM_FACTS[randomIndex];
-    }
-
-    if (
-        text.includes("achievement")
+        text.includes("save") ||
+        text.includes("local storage") ||
+        text.includes("progress saved")
     ) {
         return (
-            "You can unlock First Beat at 10 points, Young Musician at " +
-            "100 points, and Doira Master at 500 points."
+            "Your username, score, selected Doira, unlocked collection, " +
+            "achievements, quiz completion, and chat history are saved in " +
+            "your browser using Local Storage."
         );
     }
 
     if (
-        text.includes("help") ||
-        text.includes("what can i do")
+        text.includes("quiz")
     ) {
         return (
-            "You can play the Doira Clicker, earn points, unlock facts, " +
-            "collect new Doira designs, view your profile, increase your " +
-            "rank, and ask me questions about Uzbek Doira culture."
+            "The educational quiz contains 15 questions. Each correct " +
+            "answer gives 1 point during the first completed attempt. " +
+            "Type /quiz or press Start Quiz to begin."
+        );
+    }
+
+    if (
+        text.includes("game") ||
+        text.includes("how to play")
+    ) {
+        return (
+            "Open the Game page and tap the Doira to earn points. " +
+            "As your score increases, you unlock facts, ranks, achievements, " +
+            "and new Doira designs."
+        );
+    }
+
+    if (
+        text.includes("profile")
+    ) {
+        return (
+            "The Profile page shows your username, score, rank, unlocked " +
+            "facts, achievements, current instrument, and Doira collection."
+        );
+    }
+
+    /*
+     * Conversation endings
+     */
+
+    if (
+        text.includes("thank") ||
+        text.includes("спасибо")
+    ) {
+        return (
+            `You are welcome, ${username}! I am always here to help you ` +
+            "learn more about the Doira."
         );
     }
 
     if (
         text.includes("bye") ||
         text.includes("goodbye") ||
+        text.includes("see you") ||
         text.includes("пока")
     ) {
         return (
-            "Goodbye! Keep learning and enjoy playing the Doira 😊"
+            "Goodbye! Keep learning, playing, and discovering Uzbek culture 😊"
         );
     }
 
     return (
-        "I am not sure about that question yet. Try asking about the " +
-        "Doira's history, structure, playing techniques, culture, score, " +
-        "bonus, facts, achievements, or collection."
+        "I do not have a prepared answer for that question yet. " +
+        "Try asking about Doira history, structure, sounds, playing " +
+        "techniques, Uzbek culture, your score, rank, collection, " +
+        "achievements, progress, bonus, quiz, or game instructions."
     );
 }
